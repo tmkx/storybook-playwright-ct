@@ -32,14 +32,13 @@
   },
   "scripts": {
     "build": "tsup",
-    "test": "vitest run"
+    "test": "vitest"
   },
   "dependencies": {
-    "@babel/core": "^7.24.7",
-    "ts-dedent": "^2.2.0",
     "wait-on": "^7.2.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.24.7",
     "@babel/types": "^7.24.7",
     "@playwright/test": "^1.45.0",
     "@storybook/channels": "^8.1.11",

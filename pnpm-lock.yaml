@@ -8,16 +8,13 @@ importers:
 
   .:
     dependencies:
-      '@babel/core':
-        specifier: ^7.24.7
-        version: 7.24.7
-      ts-dedent:
-        specifier: ^2.2.0
-        version: 2.2.0
       wait-on:
         specifier: ^7.2.0
         version: 7.2.0
     devDependencies:
+      '@babel/core':
+        specifier: ^7.24.7
+        version: 7.24.7
       '@babel/types':
         specifier: ^7.24.7
         version: 7.24.7
