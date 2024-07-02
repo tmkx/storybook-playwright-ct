@@ -1,0 +1,60 @@
+{
+  "name": "storybook-playwright-ct",
+  "version": "0.0.1",
+  "description": "Storybook <3 Playwright",
+  "author": "Tmk <i@tmk.im>",
+  "keywords": [
+    "storybook",
+    "playwright",
+    "e2e"
+  ],
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      }
+    }
+  },
+  "repository": {
+    "url": "https://github.com/tmkx/storybook-playwright-ct.git"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@babel/core": "^7.24.7",
+    "ts-dedent": "^2.2.0",
+    "wait-on": "^7.2.0"
+  },
+  "devDependencies": {
+    "@babel/types": "^7.24.7",
+    "@playwright/test": "^1.45.0",
+    "@storybook/channels": "^8.1.11",
+    "@storybook/csf": "^0.1.10",
+    "@storybook/types": "^8.1.11",
+    "@types/babel__core": "^7.20.5",
+    "@types/node": "^20.14.9",
+    "@types/wait-on": "^5.3.4",
+    "tsup": "^8.1.0",
+    "typescript": "^5.5.3",
+    "vitest": "^1.6.0"
+  },
+  "peerDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@storybook/csf": "^0.1.0"
+  },
+  "packageManager": "pnpm@9.4.0"
+}
