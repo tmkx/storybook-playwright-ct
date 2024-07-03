@@ -14,7 +14,7 @@ interface StoryImport {
 
 interface PortableStory {
   import: StoryImport;
-  storyName?: string;
+  storyName: string;
 }
 
 interface CustomState extends PluginPass {
@@ -68,6 +68,7 @@ export default function (babelContext: { types: typeof BabelTypes }): PluginObj<
             if (t.isIdentifier(id)) {
               state.portableStories![id.name] = {
                 import: storyImport,
+                storyName: id.name,
               };
             } else if (t.isObjectPattern(id)) {
               id.properties.forEach((property) => {
@@ -87,33 +88,44 @@ export default function (babelContext: { types: typeof BabelTypes }): PluginObj<
       },
       CallExpression: {
         enter(path, state) {
+          if (!state.filename) throw new Error(`filename is undefined`);
           if (
-            t.isIdentifier(path.node.callee) &&
-            path.node.callee.name === 'mount' &&
-            path.node.arguments.length >= 1 &&
-            !t.isStringLiteral(path.node.arguments[0])
-          ) {
-            const arg0 = path.node.arguments[0];
-            let exportName;
-            let importPath;
-            if (t.isIdentifier(arg0)) {
-              const storyImport = findImport(state.storyImports!, arg0.name);
-              ({ exportName, path: importPath } = storyImport);
-            } else if (t.isMemberExpression(arg0) && t.isIdentifier(arg0.object) && t.isIdentifier(arg0.property)) {
-              exportName = arg0.property.name;
-              const storyImport = findImport(state.storyImports!, arg0.object.name);
-              importPath = storyImport.path;
-            }
-            if (exportName && importPath && state.filename) {
-              const storyPath = resolve(dirname(state.filename), importPath);
-              const title = lookupTitle(storyPath);
-              path.node.arguments[0] = t.stringLiteral(toId(title, storyNameFromExport(exportName)));
-            } else {
-              throw new Error(`Could not find story import for ${arg0}`);
-            }
+            !t.isIdentifier(path.node.callee) ||
+            path.node.callee.name !== 'mount' ||
+            path.node.arguments.length !== 1
+          )
+            return;
+
+          const componentArg = path.node.arguments[0];
+
+          if (t.isIdentifier(componentArg)) {
+            const portableStoryName = componentArg.name;
+            const portableStory = state.portableStories![portableStoryName];
+            if (!portableStory) throw new Error(`Could not find story import for ${portableStoryName}`);
+            const {
+              import: { path: importPath, exportName },
+              storyName,
+            } = portableStory;
+            const storyPath = resolve(dirname(state.filename), importPath);
+            const title = lookupTitle(storyPath);
+            path.node.arguments = [
+              storyObject(t, {
+                id: toId(title, storyNameFromExport(storyName!)),
+              }),
+            ];
           }
         },
       },
     },
   };
+}
+
+export interface MountStory {
+  id: string;
+  props?: Record<string, string | number | boolean>;
+  children?: string | number | boolean | (string | number | boolean)[];
+}
+
+function storyObject(t: typeof BabelTypes, story: MountStory) {
+  return t.objectExpression([t.objectProperty(t.identifier('id'), t.stringLiteral(story.id))]);
 }
