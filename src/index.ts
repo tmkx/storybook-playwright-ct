@@ -11,12 +11,10 @@ import type {
   PlaywrightTestConfig,
   BrowserContext,
 } from '@playwright/test';
-import { test as baseTest, expect, devices, defineConfig as baseDefineConfig } from '@playwright/test';
+import { test as baseTest, expect, devices, defineConfig as originalDefineConfig } from '@playwright/test';
 import type { Channel } from '@storybook/channels';
-import type { Args } from '@storybook/types';
+import type { Args, ComposedStoryFn } from '@storybook/types';
 
-type StoryId = string;
-type StoryOrExport = StoryId;
 type MountResult = Locator;
 
 let boundCallbacksForMount: Function[] = [];
@@ -28,7 +26,7 @@ declare global {
 const fixtures: Fixtures<
   PlaywrightTestArgs &
     PlaywrightTestOptions & {
-      mount: (storyId: StoryOrExport, args?: Args) => Promise<MountResult>;
+      mount: <TArgs extends Args>(composedStory: ComposedStoryFn<any, TArgs>, args?: TArgs) => Promise<MountResult>;
     },
   PlaywrightWorkerArgs & PlaywrightWorkerOptions & { _ctWorker: { context: BrowserContext | undefined; hash: string } },
   {
@@ -52,7 +50,8 @@ const fixtures: Fixtures<
   },
 
   mount: async ({ page }, use, info) => {
-    await use(async (storyId: StoryOrExport, args?: Args) => {
+    await use(async (composedStory, args) => {
+      const storyId = composedStory as unknown as string;
       boundCallbacksForMount = [];
       if (args) wrapFunctions(args, page, boundCallbacksForMount);
 
@@ -63,7 +62,7 @@ const fixtures: Fixtures<
       const server = Array.isArray(config.webServer) ? config.webServer[0] : config.webServer;
       const url = server.url || `http://localhost:${server.port}`;
 
-      await page.goto(path.join(url, 'iframe.html'));
+      await page.goto(new URL('iframe.html', url).toString());
 
       await page.evaluate(
         async ({ storyId, args }) => {
@@ -128,24 +127,22 @@ function wrapFunctions(object: any, page: Page, callbacks: Function[]) {
   }
 }
 
-const defineConfig = (config: PlaywrightTestConfig) =>
-  baseDefineConfig({
+const defineConfig: typeof originalDefineConfig = (config: PlaywrightTestConfig) => {
+  const original = originalDefineConfig({
     globalSetup: path.join(__dirname, 'global-setup.js'),
     ...config,
-    build: {
-      // @ts-expect-error WTH
-      babelPlugins: [...(config.build?.babelPlugins || []), [path.join(__dirname, 'ct-test-plugin.js')]],
-      // @ts-expect-error WTH
-      external: [/playwright-ct\/.*.js$/],
-      ...config.build,
-    },
-    webServer: {
-      command: 'npm run storybook',
-      url: 'http://localhost:6006',
-      reuseExistingServer: true,
-      ...config.webServer,
-    },
   });
+
+  // @ts-expect-error
+  const pwTestConfig = original['@playwright/test'];
+  return {
+    ...original,
+    '@playwright/test': {
+      ...pwTestConfig,
+      babelPlugins: [...(pwTestConfig?.babelPlugins || []), [path.join(__dirname, 'ct-test-plugin.js')]],
+    },
+  };
+};
 
 // @ts-expect-error WTH
 const test = baseTest.extend(fixtures);

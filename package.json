@@ -26,22 +26,25 @@
     "url": "https://github.com/tmkx/storybook-playwright-ct.git"
   },
   "scripts": {
-    "build": "tsup",
-    "test": "vitest"
-  },
-  "dependencies": {
-    "wait-on": "^7.2.0"
+    "prepack": "tsup",
+    "watch": "tsup --watch",
+    "test": "vitest src",
+    "test:ct": "playwright test --config playwright-ct.config.ts",
+    "storybook": "storybook dev --port 6006"
   },
   "devDependencies": {
     "@babel/core": "^7.24.7",
-    "@babel/types": "^7.24.7",
     "@playwright/test": "^1.45.0",
     "@storybook/channels": "^8.1.11",
     "@storybook/csf": "^0.1.10",
+    "@storybook/react": "^8.1.11",
+    "@storybook/react-vite": "^8.1.11",
     "@storybook/types": "^8.1.11",
     "@types/babel__core": "^7.20.5",
     "@types/node": "^20.14.9",
-    "@types/wait-on": "^5.3.4",
+    "@types/react": "^18.3.3",
+    "react": "^18.3.1",
+    "storybook": "^8.1.11",
     "tsup": "^8.1.0",
     "typescript": "^5.5.3",
     "vitest": "^1.6.0"

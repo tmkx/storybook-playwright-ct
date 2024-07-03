@@ -14,5 +14,5 @@
     "noUnusedParameters": true,
     "moduleResolution": "Bundler",
   },
-  "exclude": ["dist"]
+  "include": ["src/**/*"]
 }

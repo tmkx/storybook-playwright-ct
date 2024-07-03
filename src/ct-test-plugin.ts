@@ -1,6 +1,6 @@
 import { resolve, dirname } from 'node:path';
 import type { PluginObj, PluginPass } from '@babel/core';
-import type * as BabelTypes from '@babel/types';
+import type * as BabelCore from '@babel/core';
 import { storyNameFromExport, toId } from '@storybook/csf';
 import { lookupTitle } from './global-setup';
 
@@ -22,15 +22,7 @@ interface CustomState extends PluginPass {
   portableStories?: Record<string, PortableStory>;
 }
 
-const findImport = (storyImports: Record<string, StoryImport>, name: string): StoryImport => {
-  const storyImport = storyImports[name];
-  if (!storyImport) {
-    throw new Error(`Could not find story import for ${name}`);
-  }
-  return storyImports[name];
-};
-
-export default function (babelContext: { types: typeof BabelTypes }): PluginObj<CustomState> {
+export default function (babelContext: typeof BabelCore): PluginObj<CustomState> {
   const { types: t } = babelContext;
   return {
     visitor: {
@@ -94,7 +86,7 @@ export default function (babelContext: { types: typeof BabelTypes }): PluginObj<
           if (
             !t.isIdentifier(path.node.callee) ||
             path.node.callee.name !== 'mount' ||
-            path.node.arguments.length !== 1
+            path.node.arguments.length === 0
           )
             return;
 
@@ -128,23 +120,9 @@ export default function (babelContext: { types: typeof BabelTypes }): PluginObj<
           const storyPath = resolve(dirname(state.filename), importPath);
           const title = lookupTitle(storyPath);
 
-          path.node.arguments = [
-            storyObject(t, {
-              id: toId(title, storyNameFromExport(exportName ?? storyName)),
-            }),
-          ];
+          path.node.arguments[0] = t.stringLiteral(toId(title, storyNameFromExport(exportName ?? storyName)));
         },
       },
     },
   };
-}
-
-export interface MountStory {
-  id: string;
-  props?: Record<string, string | number | boolean>;
-  children?: string | number | boolean | (string | number | boolean)[];
-}
-
-function storyObject(t: typeof BabelTypes, story: MountStory) {
-  return t.objectExpression([t.objectProperty(t.identifier('id'), t.stringLiteral(story.id))]);
 }

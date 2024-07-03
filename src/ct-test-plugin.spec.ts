@@ -57,9 +57,7 @@ it('should transform simple component', () => {
     test('login', async ({
       mount
     }) => {
-      const component = await mount({
-        id: "src-stories-page-stories--primary"
-      });
+      const component = await mount("src-stories-page-stories--primary");
       const login = await component.getByRole('button');
     });"
   `);
@@ -85,9 +83,7 @@ it('should transform renamed component', () => {
     test('login', async ({
       mount
     }) => {
-      const component = await mount({
-        id: "src-stories-page-stories--primary"
-      });
+      const component = await mount("src-stories-page-stories--primary");
       const login = await component.getByRole('button');
     });"
   `);
@@ -115,12 +111,8 @@ it('should transform destructed import component', () => {
     test('login', async ({
       mount
     }) => {
-      const primaryComponent = await mount({
-        id: "src-stories-page-stories--primary"
-      });
-      const secondaryComponent = await mount({
-        id: "src-stories-page-stories--secondary"
-      });
+      const primaryComponent = await mount("src-stories-page-stories--primary");
+      const secondaryComponent = await mount("src-stories-page-stories--secondary");
       const login = await component.getByRole('button');
     });"
   `);
@@ -141,15 +133,43 @@ it('should transform grouped component', () => {
       });
     `)?.code
   ).toMatchInlineSnapshot(`
-      "import { composeStory, composeStories } from '@storybook/react';
+    "import { composeStory, composeStories } from '@storybook/react';
+    import { test, expect } from '../src/ct';
+    test('login', async ({
+      mount
+    }) => {
+      const component = await mount("src-stories-page-stories--primary");
+      const login = await component.getByRole('button');
+    });"
+  `);
+});
+
+it('should keep component args', () => {
+  expect(
+    transformCode(`
+      import { composeStory, composeStories } from '@storybook/react';
       import { test, expect } from '../src/ct';
-      test('login', async ({
-        mount
-      }) => {
-        const component = await mount({
-          id: "src-stories-page-stories--primary"
+      import * as stories from '../src/stories/Page.stories';
+
+      const { Primary } = composeStories(stories);
+
+      test('login', async ({ mount }) => {
+        const component = await mount(Primary, {
+          label: 'Hello',
         });
         const login = await component.getByRole('button');
-      });"
-    `);
+      });
+    `)?.code
+  ).toMatchInlineSnapshot(`
+    "import { composeStory, composeStories } from '@storybook/react';
+    import { test, expect } from '../src/ct';
+    test('login', async ({
+      mount
+    }) => {
+      const component = await mount("src-stories-page-stories--primary", {
+        label: 'Hello'
+      });
+      const login = await component.getByRole('button');
+    });"
+  `);
 });
