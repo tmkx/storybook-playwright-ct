@@ -153,28 +153,3 @@ it('should transform grouped component', () => {
       });"
     `);
 });
-
-// it('story export', () => {
-//   const input = dedent`
-//       import { test, expect } from '../src/ct';
-//       import { LoggedOut } from '../src/stories/Page.stories';
-
-//       test('login', async ({ mount }) => {
-//         const page = await mount(LoggedOut);
-//         const login = await page.getByRole('button', { name: 'Log in' });
-//       });
-//     `;
-//   const result = babel.transform(input, { plugins: [plugin] });
-//   expect(result?.code).toMatchInlineSnapshot(`
-//     "import { test, expect } from '../src/ct';
-//     ;
-//     test('login', async ({
-//       mount
-//     }) => {
-//       const page = await mount(\\"lookup-title--logged-out\\");
-//       const login = await page.getByRole('button', {
-//         name: 'Log in'
-//       });
-//     });"
-//   `);
-// });
