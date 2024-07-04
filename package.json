@@ -1,6 +1,6 @@
 {
   "name": "storybook-playwright-ct",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Storybook <3 Playwright",
   "author": "Tmk <i@tmk.im>",
   "keywords": [
@@ -54,5 +54,9 @@
     "@playwright/test": "^1.40.0",
     "@storybook/csf": "^0.1.0"
   },
-  "packageManager": "pnpm@9.4.0"
+  "packageManager": "pnpm@9.4.0",
+  "publishConfig": {
+    "scripts": {},
+    "devDependencies": {}
+  }
 }

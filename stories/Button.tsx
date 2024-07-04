@@ -14,10 +14,11 @@ interface ButtonProps {
    * How large should the button be?
    */
   size?: 'small' | 'medium' | 'large';
+
   /**
    * Button contents
    */
-  label: string;
+  children?: React.ReactNode;
   /**
    * Optional click handler
    */
@@ -27,7 +28,7 @@ interface ButtonProps {
 /**
  * Primary UI component for user interaction
  */
-export const Button = ({ primary = false, size = 'medium', backgroundColor, label, ...props }: ButtonProps) => {
+export const Button = ({ primary = false, size = 'medium', backgroundColor, ...props }: ButtonProps) => {
   const mode = primary ? 'storybook-button--primary' : 'storybook-button--secondary';
   return (
     <button
@@ -35,8 +36,6 @@ export const Button = ({ primary = false, size = 'medium', backgroundColor, labe
       className={['storybook-button', `storybook-button--${size}`, mode].join(' ')}
       style={{ backgroundColor }}
       {...props}
-    >
-      {label}
-    </button>
+    />
   );
 };

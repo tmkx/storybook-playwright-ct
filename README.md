@@ -1,5 +1,7 @@
 ## Get Started
 
+> Requirements: Storybook v8
+
 ```ts
 // playwright-ct.config.ts
 import { defineConfig } from 'storybook-playwright-ct';

@@ -134,6 +134,20 @@ function jsxAttributesToObject(
   { types: t }: typeof BabelCore,
   jsxElement: BabelCore.types.JSXElement
 ): BabelCore.types.Expression {
+  const children: BabelCore.types.Expression[] = [];
+
+  if (jsxElement.children.length > 0) {
+    for (const jsxChild of jsxElement.children) {
+      if (t.isJSXText(jsxChild)) {
+        children.push(t.stringLiteral(jsxChild.value));
+      } else if (t.isJSXExpressionContainer(jsxChild)) {
+        if (!t.isJSXEmptyExpression(jsxChild.expression)) children.push(jsxChild.expression);
+      } else {
+        throw new Error(`${jsxChild.type} is not allowed as component children`);
+      }
+    }
+  }
+
   return t.objectExpression([
     ...jsxElement.openingElement.attributes
       .map((attr) => {
@@ -152,5 +166,8 @@ function jsxAttributesToObject(
         return null;
       })
       .filter((v): v is Exclude<typeof v, null> => !!v),
+    ...(children.length > 0
+      ? [t.objectProperty(t.identifier('children'), children.length === 1 ? children[0] : t.arrayExpression(children))]
+      : []),
   ]);
 }

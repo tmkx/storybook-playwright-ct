@@ -112,3 +112,59 @@ it('should transform jsx with spread', () => {
     });"
   `);
 });
+
+it('should transform jsx with children 1', () => {
+  expect(
+    transformCode(`
+      import { composeStories } from '@storybook/react';
+      import { expect, test } from 'storybook-playwright-ct';
+      import * as stories from '../../stories/Button.stories';
+
+      const { Primary, Secondary } = composeStories(stories);
+
+      test('Children', async ({ mount }) => {
+        const component = await mount(<Primary>Text</Primary>);
+      });
+    `)
+  ).toMatchInlineSnapshot(`
+    ""use strict";
+
+    var _react = require("@storybook/react");
+    var _storybookPlaywrightCt = require("storybook-playwright-ct");
+    (0, _storybookPlaywrightCt.test)('Children', async ({
+      mount
+    }) => {
+      const component = await mount("stories-button-stories--primary", {
+        children: "Text"
+      });
+    });"
+  `);
+});
+
+it('should transform jsx with children 2', () => {
+  expect(
+    transformCode(`
+      import { composeStories } from '@storybook/react';
+      import { expect, test } from 'storybook-playwright-ct';
+      import * as stories from '../../stories/Button.stories';
+
+      const { Primary, Secondary } = composeStories(stories);
+
+      test('Children', async ({ mount }) => {
+        const component = await mount(<Primary>Text {123}</Primary>);
+      });
+    `)
+  ).toMatchInlineSnapshot(`
+    ""use strict";
+
+    var _react = require("@storybook/react");
+    var _storybookPlaywrightCt = require("storybook-playwright-ct");
+    (0, _storybookPlaywrightCt.test)('Children', async ({
+      mount
+    }) => {
+      const component = await mount("stories-button-stories--primary", {
+        children: ["Text ", 123]
+      });
+    });"
+  `);
+});
