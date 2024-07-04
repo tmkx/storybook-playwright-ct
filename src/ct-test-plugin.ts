@@ -92,37 +92,65 @@ export default function (babelContext: typeof BabelCore): PluginObj<CustomState>
 
           const componentArg = path.node.arguments[0];
 
-          let importPath!: string;
-          let exportName!: string | undefined;
-          let storyName!: string;
+          let portableStoryName!: string;
+          let storyName: string | undefined;
           if (t.isIdentifier(componentArg)) {
-            const portableStoryName = componentArg.name;
-            const portableStory = state.portableStories![portableStoryName];
-            if (!portableStory) throw new Error(`Could not find story import for ${portableStoryName}`);
-            ({
-              import: { path: importPath, exportName },
-              storyName,
-            } = portableStory);
+            // mount(Primary)
+            portableStoryName = componentArg.name;
           } else if (
             t.isMemberExpression(componentArg) &&
             t.isIdentifier(componentArg.object) &&
             t.isIdentifier(componentArg.property)
           ) {
-            const portableStoryName = componentArg.object.name;
-            const portableStory = state.portableStories![portableStoryName];
-            if (!portableStory) throw new Error(`Could not find story import for ${portableStoryName}`);
-            ({
-              import: { path: importPath, exportName },
-            } = portableStory);
+            // mount(portableStories.Primary)
+            portableStoryName = componentArg.object.name;
             storyName = componentArg.property.name;
+          } else if (t.isJSXElement(componentArg) && t.isJSXIdentifier(componentArg.openingElement.name)) {
+            // mount(<Primary />)
+            portableStoryName = componentArg.openingElement.name.name;
+            path.node.arguments[1] = jsxAttributesToObject(babelContext, componentArg);
           } else return;
+
+          const portableStory = state.portableStories![portableStoryName];
+          if (!portableStory) throw new Error(`Could not find story import for ${portableStoryName}`);
+          const {
+            import: { path: importPath, exportName },
+            storyName: defaultStoryName,
+          } = portableStory;
 
           const storyPath = resolve(dirname(state.filename), importPath);
           const title = lookupTitle(storyPath);
 
-          path.node.arguments[0] = t.stringLiteral(toId(title, storyNameFromExport(exportName ?? storyName)));
+          path.node.arguments[0] = t.stringLiteral(
+            toId(title, storyNameFromExport(exportName ?? storyName ?? defaultStoryName))
+          );
         },
       },
     },
   };
+}
+
+function jsxAttributesToObject(
+  { types: t }: typeof BabelCore,
+  jsxElement: BabelCore.types.JSXElement
+): BabelCore.types.Expression {
+  return t.objectExpression([
+    ...jsxElement.openingElement.attributes
+      .map((attr) => {
+        if (t.isJSXAttribute(attr) && t.isJSXIdentifier(attr.name)) {
+          // <JSX type="button" />
+          if (t.isExpression(attr.value)) return t.objectProperty(t.identifier(attr.name.name), attr.value);
+          // <JSX min={0} />
+          else if (t.isJSXExpressionContainer(attr.value) && !t.isJSXEmptyExpression(attr.value.expression))
+            return t.objectProperty(t.identifier(attr.name.name), attr.value.expression);
+          // <JSX disabled />
+          else if (!attr.value) return t.objectProperty(t.identifier(attr.name.name), t.booleanLiteral(true));
+        } else if (t.isJSXSpreadAttribute(attr)) {
+          // <JSX {...props} />
+          return t.spreadElement(attr.argument);
+        }
+        return null;
+      })
+      .filter((v): v is Exclude<typeof v, null> => !!v),
+  ]);
 }

@@ -14,15 +14,6 @@ export default defineConfig({
 });
 ```
 
-```json
-// package.json
-{
-  "scripts": {
-    "test:ct": "playwright test --config playwright-ct.config.ts"
-  }
-}
-```
-
 ```ts
 // stories/Button.stories.spec.ts
 import { composeStories } from '@storybook/react';
@@ -36,6 +27,14 @@ test('A', async ({ mount }) => {
 
   await expect(component).toHaveScreenshot();
 });
+```
+
+```json
+{
+  "scripts": {
+    "test:ct": "playwright test --config playwright-ct.config.ts"
+  }
+}
 ```
 
 ## Credits

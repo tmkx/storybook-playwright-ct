@@ -1,6 +1,6 @@
 {
   "name": "storybook-playwright-ct",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Storybook <3 Playwright",
   "author": "Tmk <i@tmk.im>",
   "keywords": [
@@ -29,6 +29,7 @@
     "prepack": "tsup",
     "watch": "tsup --watch",
     "test": "vitest tests/unit",
+    "test:integration": "vitest tests/integration",
     "test:ct": "playwright test --config playwright-ct.config.ts",
     "storybook": "storybook dev --port 6006"
   },

@@ -12,7 +12,7 @@
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
     "noUnusedParameters": true,
-    "moduleResolution": "Bundler",
+    "moduleResolution": "Bundler"
   },
   "include": ["src/**/*"]
 }

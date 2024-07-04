@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import path from 'node:path';
 import type {
   Fixtures,
@@ -15,19 +16,19 @@ import { test as baseTest, expect, devices, defineConfig as originalDefineConfig
 import type { Channel } from '@storybook/channels';
 import type { Args, ComposedStoryFn } from '@storybook/types';
 
-type MountResult = Locator;
-
 let boundCallbacksForMount: Function[] = [];
 
 declare global {
   let __STORYBOOK_ADDONS_CHANNEL__: Channel;
 }
 
+interface ExtendedFixture {
+  mount(element: React.JSX.Element | React.ReactElement): Promise<Locator>;
+  mount<TArgs extends Args>(composedStory: ComposedStoryFn<any, TArgs>, args?: TArgs): Promise<Locator>;
+}
+
 const fixtures: Fixtures<
-  PlaywrightTestArgs &
-    PlaywrightTestOptions & {
-      mount: <TArgs extends Args>(composedStory: ComposedStoryFn<any, TArgs>, args?: TArgs) => Promise<MountResult>;
-    },
+  PlaywrightTestArgs & PlaywrightTestOptions & ExtendedFixture,
   PlaywrightWorkerArgs & PlaywrightWorkerOptions & { _ctWorker: { context: BrowserContext | undefined; hash: string } },
   {
     _contextFactory: (options?: BrowserContextOptions) => Promise<BrowserContext>;
@@ -50,12 +51,13 @@ const fixtures: Fixtures<
   },
 
   mount: async ({ page }, use, info) => {
+    // @ts-expect-error ts overrides
     await use(async (composedStory, args) => {
       const storyId = composedStory as unknown as string;
       boundCallbacksForMount = [];
       if (args) wrapFunctions(args, page, boundCallbacksForMount);
 
-      if (typeof storyId !== 'string') return {} as MountResult;
+      if (typeof storyId !== 'string') throw new Error(`Unexpected story id: ${storyId}`);
 
       const config = (info as any)._configInternal.config as PlaywrightTestConfig;
       if (!config.webServer) throw new Error('webServer config is missing');
