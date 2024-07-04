@@ -5,7 +5,7 @@ import type { IndexEntry, StoryIndex } from '@storybook/types';
 let indexEntries: IndexEntry[] = [];
 
 export const lookupTitle = (filename: string) => {
-  const relativePath = `./${path.relative(process.cwd(), filename)}`;
+  const relativePath = `./${path.relative(process.cwd(), filename).replaceAll('\\', '/')}`;
   const entry = indexEntries.find((entry) => entry.importPath.startsWith(relativePath));
   if (!entry) {
     throw new Error(`Could not find title for ${relativePath} in ${indexEntries.map((entry) => entry.importPath)}`);

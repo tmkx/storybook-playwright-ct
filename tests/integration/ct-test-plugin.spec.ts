@@ -4,7 +4,7 @@ import { expect, it } from 'vitest';
 
 require.cache[path.resolve(__dirname, '../../node_modules/storybook-playwright-ct/dist/global-setup.js')] = {
   exports: {
-    lookupTitle: (filename: string) => filename,
+    lookupTitle: (filename: string) => filename.replace(/^\w\:/, ''),
   },
 } as NodeModule;
 

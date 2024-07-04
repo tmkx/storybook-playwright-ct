@@ -3,7 +3,7 @@ import { it, expect, vi } from 'vitest';
 import plugin from '../../src/ct-test-plugin';
 
 vi.mock('../../src/global-setup', () => ({
-  lookupTitle: (filename: string) => filename,
+  lookupTitle: (filename: string) => filename.replace(/^\w\:/, ''),
 }));
 
 function transformCode(input: string): babel.BabelFileResult | null {
