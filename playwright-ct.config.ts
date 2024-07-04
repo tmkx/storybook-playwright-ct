@@ -1,7 +1,7 @@
 import { defineConfig } from './node_modules/storybook-playwright-ct/dist';
 
 export default defineConfig({
-  testDir: './e2e',
+  testDir: './tests/e2e',
   testMatch: '**/*.stories.spec.{ts,tsx}',
   webServer: {
     command: 'pnpm storybook',

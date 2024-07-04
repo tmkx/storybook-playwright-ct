@@ -1,6 +1,6 @@
 import { composeStories } from '@storybook/react';
-import { expect, test } from '../node_modules/storybook-playwright-ct/dist';
-import * as stories from '../src/stories/Button.stories';
+import { expect, test } from '../../node_modules/storybook-playwright-ct/dist';
+import * as stories from '../../stories/Button.stories';
 
 const { Primary, Secondary } = composeStories(stories);
 

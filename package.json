@@ -28,7 +28,7 @@
   "scripts": {
     "prepack": "tsup",
     "watch": "tsup --watch",
-    "test": "vitest src",
+    "test": "vitest tests/unit",
     "test:ct": "playwright test --config playwright-ct.config.ts",
     "storybook": "storybook dev --port 6006"
   },

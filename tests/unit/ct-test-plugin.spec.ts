@@ -1,8 +1,8 @@
 import babel from '@babel/core';
 import { it, expect, vi } from 'vitest';
-import plugin from './ct-test-plugin';
+import plugin from '../../src/ct-test-plugin';
 
-vi.mock('./global-setup', () => ({
+vi.mock('../../src/global-setup', () => ({
   lookupTitle: (filename: string) => filename,
 }));
 
