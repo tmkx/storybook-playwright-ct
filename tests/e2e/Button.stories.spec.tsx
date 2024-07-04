@@ -16,8 +16,8 @@ test('Simplest usage', async ({ mount }) => {
 test('Pass serializable args', async ({ mount }) => {
   const component = await mount(Primary, {
     primary: false,
-    label: 'Hello',
     size: 'small',
+    children: 'Hello',
   });
 
   await expect(component.innerHTML()).resolves.toBe(
@@ -54,4 +54,20 @@ test('JSX', async ({ mount }) => {
   expect(called).toBeFalsy();
   await component.click();
   expect(called).toBeTruthy();
+});
+
+test('Children 1', async ({ mount }) => {
+  const component = await mount(<Primary>Text</Primary>);
+
+  await expect(component.innerHTML()).resolves.toBe(
+    '<button type="button" class="storybook-button storybook-button--medium storybook-button--primary">Text</button>'
+  );
+});
+
+test('Children 2', async ({ mount }) => {
+  const component = await mount(<Primary>Text {666}</Primary>);
+
+  await expect(component.innerHTML()).resolves.toBe(
+    '<button type="button" class="storybook-button storybook-button--medium storybook-button--primary">Text 666</button>'
+  );
 });
