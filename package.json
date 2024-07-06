@@ -1,6 +1,6 @@
 {
   "name": "storybook-playwright-ct",
-  "version": "0.0.3",
+  "version": "0.1.1",
   "description": "Storybook <3 Playwright",
   "author": "Tmk <i@tmk.im>",
   "keywords": [
