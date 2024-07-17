@@ -71,3 +71,10 @@ test('Children 2', async ({ mount }) => {
     '<button type="button" class="storybook-button storybook-button--medium storybook-button--primary">Text 666</button>'
   );
 });
+
+test('Click', async ({ mount }) => {
+  let eventType;
+  const component = await mount(<Primary onClick={(ev) => (eventType = ev.type)} />);
+  await component.click();
+  await expect(eventType).toBe('click');
+});
